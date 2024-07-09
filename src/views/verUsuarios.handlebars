@@ -1,0 +1,78 @@
+{{>header}}
+
+<div>
+    <h1>Usuarios</h1>
+</div>
+
+{{#each usuarios}}
+<div>
+    <h2>Nombre: {{first_name}}</h2>
+    <p>Email: {{email}}</p>
+    <p>Rol: {{role}}</p>
+
+    <button class="btnPremium" data-id="{{id}}">Cambiar a Premium</button>
+
+    <button class="btnMios" data-id="{{id}}">Eliminar</button>
+    
+</div>
+{{/each}}
+
+{{#if hasNextPage}}
+<a href="/Usuarios?page={{nextPage}}">Siguiente</a>
+{{/if}}
+{{#if hasPrevPage}}
+<a href="/Usuarios?page={{prevPage}}">Anterior</a>
+{{/if}}
+
+<p>Página {{currentPage}} de {{totalPages}}</p>
+
+<script>
+    document.querySelectorAll('.btnPremium').forEach(btn => {
+    btn.addEventListener('click', async (event) => {
+        const userId = event.target.dataset.id;
+        try {
+            const response = await fetch(`/api/users/premium/${userId}`, {
+                method: 'PUT'
+            });
+            if (response.ok) {
+                const newRole = await response.text();
+                alert(`El usuario ahora tiene el rol de ${newRole}`);
+               
+            } else {
+                const data = await response.json();
+                alert(data.message);
+            }
+        } catch (error) {
+            console.log(error);
+            alert('El usuario no cumple los requisitos');
+        }
+    });
+});
+
+    
+
+    ///////////////////////////////////
+    document.querySelectorAll('.btnMios').forEach(btn => {
+        btn.addEventListener('click', async (event) => {
+            const userId = event.target.dataset.id;
+            try {
+                const response = await fetch(`/api/users/${userId}`, {
+                    method: 'DELETE'
+                });
+                if (response.ok) {
+                    alert('Usuario eliminado exitosamente');
+                    // Puedes agregar lógica adicional, como recargar la página o remover el elemento del DOM
+                } else {
+                    const data = await response.json();
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Error al eliminar el usuario');
+            }
+        });
+    });
+
+
+</script>
+
